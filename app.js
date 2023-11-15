@@ -311,7 +311,7 @@ async function openCVTemplateMatch(templateBitmap){
         
         // Find the maximum trust
         let maxTrust = -Infinity;
-        for (let key in maps) {
+        for (const key in maps) {
             if (maps.hasOwnProperty(key)) {
                 maxTrust = Math.max(maxTrust, maps[key].trust);
             }
@@ -463,44 +463,76 @@ async function processScreenshot() {
         console.error(error);
     }
 }
+class Timer {
+  #stamps = new Map();
+
+  stamp(label) {
+    if (typeof label === 'string') {
+      this.#stamps.set(label, performance.now());
+    }
+  }
+
+  table(label) {
+    if (typeof label !== 'string') {
+      throw new TypeError("typeof label !== 'string'");
+    }
+
+    const base = this.#stamps.get(label);
+    if (base == null) {
+      throw new Error("stamps[label] == null");
+    }
+    
+    const relative = {};
+    for (const [ key, stamp ] of this.#stamps.entries()) {
+      relative[key] = stamp - base;
+    }
+
+    return relative;
+  }
+}
+
 async function log_processScreenshot() {
+    const timer = new Timer;
+    
     try {
-        console.log("Getting screenshot...");
+        timer.stamp("Getting screenshot...");
         const screen = await getScreenShot();
 
-        console.log("Checking mapTrust...");
+        timer.stamp("Checking mapTrust...");
         if(mapTrust == null)
             mapTrust = resetMapTrust();
 
-        console.log("Checking if in-game...");
+        timer.stamp("Checking if in-game...");
         if(await checkIfIngame(screen)){
-            console.log("Getting minimap...");
+            timer.stamp("Getting minimap...");
             let croppedImage = await getMinimap(screen);
 
-            console.log("Getting player position offset...");
+            timer.stamp("Getting player position offset...");
             playerPositionOffset = getPlayerPositionVsCaptureDelta(screen, croppedImage);
 
-            console.log("Resizing minimap to atlas size...");
+            timer.stamp("Resizing minimap to atlas size...");
             let rescaledImage = await resizeMinimapToAtlasSize(croppedImage);
 
-            console.log("Creating temporary canvas...");
+            timer.stamp("Creating temporary canvas...");
             let tempCanvas = document.createElement('canvas');
             tempCanvas.width = rescaledImage.width;
             tempCanvas.height = rescaledImage.height;
             let tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(rescaledImage, 0, 0);
 
-            console.log("Performing OpenCV template match...");
+            timer.stamp("Performing OpenCV template match...");
             await openCVTemplateMatch(tempCanvas);
+            timer.stamp("Completed OpenCV template match...");
         } else {
-            console.log("Resetting mapTrust...");
+            timer.stamp("Resetting mapTrust...");
             resetMapTrust();
         }
     } catch (error) {
         console.error(error);
     }
 
-    console.log("Setting timeout for next screenshot...");
+    timer.stamp("Setting timeout for next screenshot...");
+    console.info(timer.table("Getting screenshot..."));
     if(captureStream && captureStream.getVideoTracks()[0].clone().readyState != "ended")
         setTimeout(log_processScreenshot, 1000);
 }

@@ -1,0 +1,130 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    cursor: url('./Sprites/Lantern32.png'), auto; /* Changes the cursor to a custom cursor on the entire webpage */
+    
+    
+    font-size: 31px;
+    /*text-shadow: -2px 2px 0px black;*/
+    color: #A67532;
+}
+:root {
+    --title-height: 20vh;
+    --map-size: calc(100vh - (var(--title-height)*2));
+}
+#titleSpace{
+    display: block;
+    height: var(--title-height);
+}
+#content{
+    width: 100vw;
+    /*height: calc(100vh - var(--title-height));*/
+    display: flex;
+    flex-wrap: wrap; /*nowrap*/
+    align-items: flex-start;
+    
+    flex-direction: row;
+    justify-content: flex-start;
+}
+#centrePanel{
+    width: var(--map-size);
+    max-width: var(--map-size);
+    min-width: var(--map-size);
+    flex-grow: 2;
+}
+#leftPanel, #rightPanel{
+    max-width: calc((100vw - var(--map-size))/2);
+    width: calc((100vw - var(--map-size))/2);
+    
+    max-height: var(--map-size);
+}
+#leftPanel{ order: 1; }
+#centrePanel{ order: 2; }
+#rightPanel{ order: 3; }
+@media (max-width: 1650px) {
+    #content {
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+    }
+    #leftPanel{ order: 3; }
+    #centrePanel{ order: 1; }
+    #rightPanel{ order: 2; }
+    #settings, #gloomDesc {
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+    }
+    #leftPanel, #rightPanel{
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+#settings{
+    margin-left: 8vh;
+    margin-right: 2vh;
+}
+#gloomDesc{
+    margin-right: 8vh;
+    margin-left: 2vh;
+}
+#settings, #gloomDesc{
+    margin-top: calc(2vh + 100px);
+    
+    
+    height: fit-content;
+    
+    padding: 1vh;
+    
+    border-top-style: ridge;
+    border-color: #935704;
+    filter: drop-shadow(2px 4px 6px black);
+    
+    background-image: linear-gradient(rgba(1,1,1,0.4), rgba(1,1,1,0.1));
+}
+h2{
+    position: absolute;
+    top: -100px;
+}
+#centrePanel, #leftPanel, #rightPanel{
+    flex-grow: 1;
+}
+#subNotes{
+    padding-left: 15px;
+}
+#map{
+    width: 100%;
+    height: var(--map-size);
+    max-height: var(--map-size);
+}
+
+#webGLCanvas{
+    position: fixed;
+    padding:0;
+    margin:0;
+
+    top:0;
+    left:0;
+
+    width: 100%;
+    height: 100%;
+    z-index: -99;
+}
+#leftPeople, #rightPeople{
+    position: absolute;
+    filter: drop-shadow(2px 4px 6px black);
+    width: 20vh;
+}
+#leftPeople{
+    content: url("./Sprites/Left People Final.png");
+    bottom: calc(var(--title-height) - 3vh);
+    left: calc(((100vw - var(--map-size))/2) - 4vh);
+}
+#rightPeople{
+    content: url("./Sprites/Right People Final.png");
+    bottom: calc(var(--title-height) - 3vh);
+    right: calc(((100vw - var(--map-size))/2) - 4vh);
+}
+*::selection{
+    background: black;
+}
